@@ -1,0 +1,37 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: "all"
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: "true"
+      topics:
+        demo-topic: evt.demo-topic.000
+    consumer:
+      group-id: demo_group_id
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      topics:
+        demo-topic: evt.demo-topic.000
+      properties:
+        max:
+          poll:
+            interval:
+              ms: 6000000
+
+#----- Distributed tracing properties ------ #
+raisin:
+  operations:
+    kafka:
+      consumer:
+        polling:
+          polling-duration: 6000000
+      # topics that the service consumers
+      service-topics:
+        - evt.demo-topic.000
+      # To define a bean mapping per topic to dictate which bean should consume messages from which topic
+      retry-consumer-mapping:
+        evt.deposit.deposit-order-updated.000: depositOrderUpdatedConsumer
